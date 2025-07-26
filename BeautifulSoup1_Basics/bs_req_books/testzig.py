@@ -3,11 +3,14 @@ from bs4 import BeautifulSoup
 import pandas as pd
 import openpyxl
 import os
+import time
 
 # Headers to mimic a browser
 headers = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36'
 }
+
+base_url = input("Enter the full base category URL (e.g. https://www.zimbabweyp.com/category/retail_services): ").rstrip('/')
 
 # File setup
 script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -31,9 +34,12 @@ Url_Dict = {
 # Start scraping from page 1
 page_no = 1
 
-while page_no < 3:
+
+
+while page_no<15:
     print(f'📄 Scraping page {page_no}...')
-    page_url = f'https://www.zimbabweyp.com/category/retail_services/{page_no}.html'
+    #page_url = f'https://www.zimbabweyp.com/category/retail_services/{page_no}.html'
+    page_url = f'{base_url}/{page_no}.html'
     response = requests.get(page_url, headers=headers)
 
     if response.status_code != 200:
@@ -44,6 +50,14 @@ while page_no < 3:
     # Find all company blocks
     companies = soup.find_all('div', class_='company with_img g_0')
     #print(companies)
+
+    # ✅ Pages_current detection
+    #current_page_tag = soup.find('span', class_='pages_current')
+    #if page_no == current_page_tag:
+        #break
+
+
+    
 
     for company in companies:
         try:
@@ -63,7 +77,7 @@ while page_no < 3:
             path = (page_url)
 
             # Get category (i.e., second element in split path)
-            category = path.split('/')[2]  # index 0: '', 1: 'category', 2: 'retail_services'
+            category = path.split('/')[-2]  # index 0: '', 1: 'category', 2: 'retail_services'
 
             # Append to dictionary
             List_dict['name'].append(name)
@@ -73,12 +87,14 @@ while page_no < 3:
         except Exception as e:
             print(f"⚠️ Error extracting data: {e}")
             continue
+
+    time.sleep(2)    
     # Go to the next page
     page_no += 1
-    if page_no > 50:
-        break
+    #if page_no > 50:
+      #  break
 
 # Save to Excel
 df = pd.DataFrame(List_dict)
-df.to_excel('List.xlsx', index=False)
+df.to_excel(f'{category}.xlsx', index=False)
 print("📘 Scraped data saved to 'Listk.xlsx'")
