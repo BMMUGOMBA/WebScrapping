@@ -9,8 +9,9 @@ import time
 headers = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36'
 }
-
+pages = 0
 base_url = input("Enter the full base category URL (e.g. https://www.zimbabweyp.com/category/retail_services): ").rstrip('/')
+pages = int( input("Enter Total Number of Pages to Loop :"))
 
 # File setup
 script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -36,7 +37,7 @@ page_no = 1
 
 
 
-while page_no<15:
+while page_no<pages:
     print(f'📄 Scraping page {page_no}...')
     #page_url = f'https://www.zimbabweyp.com/category/retail_services/{page_no}.html'
     page_url = f'{base_url}/{page_no}.html'
@@ -88,7 +89,7 @@ while page_no<15:
             print(f"⚠️ Error extracting data: {e}")
             continue
 
-    time.sleep(2)    
+    time.sleep(5)    
     # Go to the next page
     page_no += 1
     #if page_no > 50:
@@ -97,4 +98,4 @@ while page_no<15:
 # Save to Excel
 df = pd.DataFrame(List_dict)
 df.to_excel(f'{category}.xlsx', index=False)
-print("📘 Scraped data saved to 'Listk.xlsx'")
+print(f"📘 Scraped data saved to '{category}'.xlsx")
